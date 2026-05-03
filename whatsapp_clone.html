@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WhatsApp Clone</title>
+<link rel="shortcut icon" href="img/wh.png" type="image/x-icon">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app" id="app">
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <img class="user-avatar" src="img/profile1.png">
+      <div style="font-size:15px;font-weight:600;color:var(--text1)">Kenneth</div>
+      <div class="header-actions">
+        <button class="icon-btn" title="New chat">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+          </svg>
+        </button>
+        <div style="position:relative;">
+          <button class="icon-btn" id="menuBtn" title="Menu">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="5" r="1"/>
+              <circle cx="12" cy="12" r="1"/>
+              <circle cx="12" cy="19" r="1"/>
+            </svg>
+          </button>
+
+          <div id="menuDropdown" class="menu-dropdown">
+            <div class="menu-item" onclick="toggleTheme()">
+              <span id="themeText">Light Mode</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="search-bar">
+      <div class="search-wrap">
+        <img src="img/magnifying-glass2.png" class="search-icon">
+        <input type="text" placeholder="Search chats..." id="searchInput">
+      </div>
+    </div>
+    <div class="chats-list" id="chatsList"></div>
+  </div>
+
+  <div class="main hidden" id="mainPanel">
+    <div class="empty-state" id="emptyState">
+      <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+      </svg>
+      <p>Select a chat to start messaging</p>
+    </div>
+
+    <div id="chatView" style="display:none;flex:1;flex-direction:column;min-height:0">
+      <div class="main-header">
+        <button class="icon-btn back-btn" onclick="goBack()">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M15 18l-6-6 6-6"/>
+          </svg>
+        </button>
+        <div class="main-header-left">
+          <div class="chat-avatar" id="hdrAvatar" style="width:38px;height:38px;font-size:14px"></div>
+          <div class="contact-info">
+            <h3 id="hdrName"></h3>
+            <p id="hdrStatus">online</p>
+          </div>
+        </div>
+        <div class="main-actions">
+          <div id="chatSearchBar" style="display:none; padding:8px 16px; background:var(--panel2);">
+            <input type="text" id="chatSearchInput" placeholder="Search messages...">
+          </div>
+          <button class="icon-btn" id="chatSearchBtn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+            </svg>
+          </button>
+          <button class="icon-btn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="messages-area" id="messagesArea"></div>
+
+      <div class="typing-indicator" id="typingIndicator">
+        <div class="typing-dot"><span></span><span></span><span></span></div>&nbsp;typing...
+      </div>
+
+      <div class="input-area">
+        <div class="input-rel">
+          <button class="emoji-btn" id="emojiToggle">😊</button>
+          <div id="emojiPanel" style="display:none" class="emoji-panel"></div>
+          <div class="msg-input-wrap">
+            <button class="attach-btn">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/>
+              </svg>
+            </button>
+            <textarea class="msg-input" id="msgInput" placeholder="Type a message" rows="1"></textarea>
+          </div>
+          <button class="send-btn" id="sendBtn">
+            <img src="img/send.png" alt="send">
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const colors = ['#1A6B4A','#1A4A7A','#6B1A4A','#4A1A6B','#1A5A6B','#6B4A1A','#4A6B1A','#6B1A1A'];
+  const EMOJIS = ['😊','😂','🙏','❤️','👍','🔥','✅','😭','😎','🎉','😍','💯','🤔','👀','🙈','😅','💪','🤣','😘','🥳','😆','🫶','💀','😴'];
+
+  const contacts = [
+    {
+      id: 1, name: 'Kang Galon', initials: 'KG', color: colors[0],img: 'img/kg.jpg', online: true, lastSeen: 'now',
+      messages: [
+        { from: 'them', text: 'Selamat pagi om, mau pesan galon?', time: '14:20', read: true },
+        { from: 'me',   text: 'Iya kang, 2 galon ya',             time: '14:22', read: true },
+        { from: 'them', text: 'galonnyo om 🤏🤏',                  time: '14:30', read: true },
+        { from: 'me',   text: 'Oke siap kang terima kasih!',      time: '14:31', read: true }
+      ],
+    },
+    {
+      id: 2, name: 'Kang Wifi Indigo', initials: 'KW', color: colors[1], img: 'img/kw.jpg', online: false, lastSeen: '2 hours ago',
+      messages: [
+        { from: 'them', text: 'Om wifi lagi gangguan nih dari tadi pagi', time: '12:10', read: true },
+        { from: 'me',   text: 'Wah kenapa tuh kang?',                     time: '12:11', read: true },
+        { from: 'them', text: 'Wifi Gangguan om, lagi kami cek',          time: '12:13', read: false }
+      ],
+    },
+    {
+      id: 3, name: 'Kang Bangunan', initials: 'KB', color: colors[2], img: 'img/kb.jpg', online: true, lastSeen: 'now',
+      messages: [
+        { from: 'me',   text: 'Kang, bisa mulai kerja besok?', time: '10:15', read: true },
+        { from: 'them', text: 'Siap om laksanakan',            time: '10:20', read: true }
+      ],
+    },
+    {
+      id: 4, name: 'Kang Utang', initials: 'KU', color: colors[3], img: 'img/ku.jpg', online: true, lastSeen: 'now',
+      messages: [
+        { from: 'them', text: 'Om pinjem 100 dulu bang 😀😀', time: 'Kemarin', read: false },
+        { from: 'them', text: 'Nanti balik lagi kok',         time: 'Kemarin', read: false }
+      ],
+    },
+    {
+      id: 5, name: 'Masa Lalu', initials: 'ML', color: colors[4], img: 'img/ml.jpg', online: false, lastSeen: '3 days ago',
+      messages: [
+        { from: 'them', text: 'Hei, masih ingat aku gak?',  time: '30 Apr', read: true },
+        { from: 'me',   text: 'Ingat dong',                 time: '30 Apr', read: true },
+        { from: 'them', text: 'gk app, nanti aja ktemu',    time: '30 Apr', read: true }
+      ],
+    },
+    {
+      id: 6, name: 'Temen', initials: 'MT', color: colors[5], img: 'img/mt.jpg', online: false, lastSeen: '1 day ago',
+      messages: [
+        { from: 'them', text: 'Eh masih di sini?',   time: '29 Apr', read: true },
+        { from: 'me',   text: 'Iya nih, kamu gimana?', time: '29 Apr', read: true },
+        { from: 'them', text: 'sedang mengetik...',   time: '29 Apr', read: false }
+      ],
+    },
+    {
+      id: 7, name: 'Pak RT', initials: 'PR', color: colors[6], img: 'img/pr.jpg', online: false, lastSeen: '5 days ago',
+      messages: [
+        { from: 'them', text: 'Iuran bulan ini jangan lupa ya', time: '20 Apr', read: true },
+        { from: 'me',   text: 'Hehe iya pak maaf telat',        time: '20 Apr', read: true },
+        { from: 'them', text: 'wkwkwkwkw oke',                 time: '20 Apr', read: true }
+      ],
+    }
+  ];
+
+  const replies = [
+    'Oke siap!','Ohhh begitu ya 😅','Mantap!','Hahaha iya betul',
+    'Bentar ya om','Oke nanti saya kabari','👍','Siap bos!',
+    'Hehe oke deh','Wkwkwk iya nih','Noted!','Makasih ya 🙏'
+  ];
+
+  let activeId   = null;
+  let emojiOpen  = false;
+
+  function getTime() {
+    const d = new Date();
+    return d.getHours().toString().padStart(2,'0') + ':' + d.getMinutes().toString().padStart(2,'0');
+  }
+
+  function escHtml(t) {
+    return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  function renderChats(filter = '') {
+    const list = document.getElementById('chatsList');
+    list.innerHTML = '';
+    contacts
+      .filter(c => c.name.toLowerCase().includes(filter.toLowerCase()))
+      .forEach(c => {
+        const last = c.messages[c.messages.length - 1];
+        const div  = document.createElement('div');
+        div.className = 'chat-item' + (activeId === c.id ? ' active' : '');
+        div.innerHTML = `
+          <div class="chat-avatar ${c.online ? 'av-online' : ''}"style="${c.img ? `background-image:url('${c.img}'); background-size:cover; background-position:center;`: `background:${c.color};`}">${c.img ? '' : c.initials}</div>
+          <div class="chat-meta">
+            <div class="chat-top">
+              <span class="chat-name">${c.name}</span>
+              <span class="chat-time" style="color:${c.unread ? 'var(--accent)' : 'var(--text3)'}">${last ? last.time : ''}</span>
+            </div>
+            <div class="chat-bottom">
+              ${last && last.from === 'me' ? `<span class="tick ${last.read ? 'read' : ''}">✓✓</span>` : ''}
+              <span class="chat-preview">${last ? last.text : ''}</span>
+            </div>
+          </div>`;
+        div.onclick = () => openChat(c.id);
+        list.appendChild(div);
+      });
+  }
+
+  function goBack() {
+    document.querySelector('.sidebar').classList.remove('hidden');
+    document.querySelector('.main').classList.add('hidden');
+  }
+
+  function openChat(id) {
+    const c = contacts.find(x => x.id === id);
+    activeId = id;
+    c.unread = 0;
+
+    document.getElementById('emptyState').style.display = 'none';
+    const cv = document.getElementById('chatView');
+    cv.style.display = 'flex';
+
+    const av = document.getElementById('hdrAvatar');
+    if (c.img) {
+      av.style.backgroundImage = `url('${c.img}')`;
+      av.style.backgroundSize = 'cover';
+      av.style.backgroundPosition = 'center';
+      av.textContent = '';
+    } else {
+      av.style.background = c.color;
+      av.textContent = c.initials;
+    }
+    document.getElementById('hdrName').textContent = c.name;
+
+    const st = document.getElementById('hdrStatus');
+    if (c.online) {
+      st.textContent = 'online';
+      st.className = '';
+    } else {
+      st.textContent = 'last seen ' + c.lastSeen;
+      st.className = 'offline';
+    }
+
+    renderMessages(c);
+    renderChats(document.getElementById('searchInput').value);
+
+    if (window.innerWidth <= 640) {
+      document.querySelector('.sidebar').classList.add('hidden');
+      document.querySelector('.main').classList.remove('hidden');
+    }
+  }
+
+  function renderMessages(c) {
+    const area = document.getElementById('messagesArea');
+    area.innerHTML = '';
+    let lastDay = '';
+
+    c.messages.forEach(m => {
+      const day = m.time.length <= 5 ? 'Today' : m.time;
+      if (day !== lastDay) {
+        lastDay = day;
+        const d = document.createElement('div');
+        d.className = 'msg-day';
+        d.innerHTML = `<span>${day}</span>`;
+        area.appendChild(d);
+      }
+      const wrap = document.createElement('div');
+      wrap.className = 'bubble-wrap ' + (m.from === 'me' ? 'out' : 'in');
+      wrap.innerHTML = `
+        <div class="bubble">${escHtml(m.text)}</div>
+        <div class="bubble-meta">
+          ${m.from === 'me' ? `<span class="tick ${m.read ? 'read' : ''}">✓✓</span>` : ''}
+          <span class="bubble-time">${m.time.length <= 5 ? m.time : ''}</span>
+        </div>`;
+      area.appendChild(wrap);
+    });
+
+    area.scrollTop = area.scrollHeight;
+  }
+
+  function sendMessage() {
+    const input = document.getElementById('msgInput');
+    const text  = input.value.trim();
+    if (!text || !activeId) return;
+
+    const c   = contacts.find(x => x.id === activeId);
+    const msg = { from: 'me', text, time: getTime(), read: false };
+    c.messages.push(msg);
+    input.value = '';
+    input.style.height = 'auto';
+
+    renderMessages(c);
+    renderChats(document.getElementById('searchInput').value);
+
+    setTimeout(() => simulateReply(c), 1500 + Math.random() * 2000);
+  }
+
+  function simulateReply(c) {
+    if (activeId !== c.id) return;
+    const ti   = document.getElementById('typingIndicator');
+    const area = document.getElementById('messagesArea');
+    ti.style.display = 'flex';
+    area.scrollTop   = area.scrollHeight;
+
+    setTimeout(() => {
+      ti.style.display = 'none';
+      const rep = replies[Math.floor(Math.random() * replies.length)];
+      c.messages.push({ from: 'them', text: rep, time: getTime(), read: true });
+
+      if (activeId === c.id) { renderMessages(c); }
+      else                   { c.unread = (c.unread || 0) + 1; }
+
+      renderChats(document.getElementById('searchInput').value);
+    }, 1200 + Math.random() * 800);
+  }
+
+  function buildEmojiPanel() {
+    const p = document.getElementById('emojiPanel');
+    EMOJIS.forEach(e => {
+      const b = document.createElement('button');
+      b.textContent = e;
+      b.onclick = () => {
+        const inp = document.getElementById('msgInput');
+        inp.value += e;
+        inp.focus();
+      };
+      p.appendChild(b);
+    });
+  }
+
+  document.getElementById('emojiToggle').onclick = function(ev) {
+    emojiOpen = !emojiOpen;
+    document.getElementById('emojiPanel').style.display = emojiOpen ? 'flex' : 'none';
+    ev.stopPropagation();
+  };
+
+  document.addEventListener('click', () => {
+    emojiOpen = false;
+    document.getElementById('emojiPanel').style.display = 'none';
+  });
+
+  document.getElementById('sendBtn').onclick = sendMessage;
+
+  document.getElementById('msgInput').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+  });
+
+  document.getElementById('msgInput').addEventListener('input', function() {
+    this.style.height = 'auto';
+    this.style.height = Math.min(this.scrollHeight, 100) + 'px';
+  });
+
+  document.getElementById('searchInput').addEventListener('input', function() {
+    renderChats(this.value);
+  });
+
+  const menuBtn = document.getElementById('menuBtn');
+  const menu = document.getElementById('menuDropdown');
+
+  menuBtn.onclick = (e) => {
+    e.stopPropagation();
+    menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+  };
+
+  document.addEventListener('click', () => {
+    menu.style.display = 'none';
+  });
+
+  let isDark = true;
+
+  function toggleTheme() {
+    isDark = !isDark;
+
+    if (!isDark) {
+      document.documentElement.style.setProperty('--g1', '#f0f2f5');
+      document.documentElement.style.setProperty('--panel', '#ffffff');
+      document.documentElement.style.setProperty('--panel2', '#ffffff');
+      document.documentElement.style.setProperty('--panel3', '#e9edef');
+      document.documentElement.style.setProperty('--text1', '#111b21');
+      document.documentElement.style.setProperty('--text2', '#54656f');
+      document.documentElement.style.setProperty('--text3', '#8696a0');
+      document.documentElement.style.setProperty('--bubble-in', '#ffffff');
+    } else {
+      location.reload();
+    }
+  }
+
+  function toggleTheme() {
+    const body = document.body;
+    const themeText = document.getElementById('themeText');
+
+    body.classList.toggle('light');
+
+    if (body.classList.contains('light')) {
+      themeText.textContent = 'Dark Mode';
+    } else {
+      themeText.textContent = 'Light Mode';
+    }
+  }
+
+  const chatSearchBtn = document.getElementById('chatSearchBtn');
+  const chatSearchBar = document.getElementById('chatSearchBar');
+  const chatSearchInput = document.getElementById('chatSearchInput');
+
+  chatSearchBtn.onclick = () => {
+    const isOpen = chatSearchBar.style.display === 'block';
+
+    chatSearchBar.style.display = isOpen ? 'none' : 'block';
+
+    if (!isOpen) {
+      chatSearchInput.focus();
+    } else {
+      chatSearchInput.value = '';
+      document.querySelectorAll('.bubble-wrap').forEach(m => m.style.display = 'flex');
+    }
+  };
+
+  chatSearchInput.addEventListener('input', function () {
+    const keyword = this.value.toLowerCase();
+    const messages = document.querySelectorAll('.bubble-wrap');
+
+    messages.forEach(msg => {
+    const text = msg.innerText.toLowerCase();
+
+    if (text.includes(keyword)) {
+        msg.style.display = 'flex';
+    } else {
+      msg.style.display = 'none';
+    }
+  });
+});
+
+  buildEmojiPanel();
+  renderChats();
+</script>
+</body>
+</html>
