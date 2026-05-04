@@ -12,7 +12,7 @@
   <div class="sidebar">
     <div class="sidebar-header">
       <img class="user-avatar" src="img/profile1.png">
-      <div style="font-size:15px;font-weight:600;color:var(--text1)">Kenneth</div>
+      <div style="font-size:15px;font-weight:600;color:var(--text1)">Kenneth Anthony Ng</div>
       <div class="header-actions">
         <button class="icon-btn" title="New chat">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -95,7 +95,8 @@
           <button class="emoji-btn" id="emojiToggle">😊</button>
           <div id="emojiPanel" style="display:none" class="emoji-panel"></div>
           <div class="msg-input-wrap">
-            <button class="attach-btn">
+            <input type="file" id="fileInput" style="display:none">
+            <button class="attach-btn" onclick="document.getElementById('fileInput').click()">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/>
               </svg>
@@ -117,7 +118,7 @@
 
   const contacts = [
     {
-      id: 1, name: 'Kang Galon', initials: 'KG', color: colors[0],img: 'img/kg.jpg', online: true, lastSeen: 'now',
+      id: 1, name: 'Mister Cleo', initials: 'KG', color: colors[0],img: 'img/kg.jpg', online: true, lastSeen: 'now',
       messages: [
         { from: 'them', text: 'Selamat pagi om, mau pesan galon?', time: '14:20', read: true },
         { from: 'me',   text: 'Iya kang, 2 galon ya',             time: '14:22', read: true },
@@ -126,7 +127,7 @@
       ],
     },
     {
-      id: 2, name: 'Kang Wifi Indigo', initials: 'KW', color: colors[1], img: 'img/kw.jpg', online: false, lastSeen: '2 hours ago',
+      id: 2, name: 'Indihome', initials: 'KW', color: colors[1], img: 'img/kw.jpg', online: false, lastSeen: '2 hours ago',
       messages: [
         { from: 'them', text: 'Om wifi lagi gangguan nih dari tadi pagi', time: '12:10', read: true },
         { from: 'me',   text: 'Wah kenapa tuh kang?',                     time: '12:11', read: true },
@@ -134,14 +135,14 @@
       ],
     },
     {
-      id: 3, name: 'Kang Bangunan', initials: 'KB', color: colors[2], img: 'img/kb.jpg', online: true, lastSeen: 'now',
+      id: 3, name: 'Kuli Hebat', initials: 'KB', color: colors[2], img: 'img/kb.jpg', online: true, lastSeen: 'now',
       messages: [
         { from: 'me',   text: 'Kang, bisa mulai kerja besok?', time: '10:15', read: true },
         { from: 'them', text: 'Siap om laksanakan',            time: '10:20', read: true }
       ],
     },
     {
-      id: 4, name: 'Kang Utang', initials: 'KU', color: colors[3], img: 'img/ku.jpg', online: true, lastSeen: 'now',
+      id: 4, name: 'Debt Collector', initials: 'KU', color: colors[3], img: 'img/ku.jpg', online: true, lastSeen: 'now',
       messages: [
         { from: 'them', text: 'Om pinjem 100 dulu bang 😀😀', time: 'Kemarin', read: false },
         { from: 'them', text: 'Nanti balik lagi kok',         time: 'Kemarin', read: false }
@@ -156,21 +157,39 @@
       ],
     },
     {
-      id: 6, name: 'Temen', initials: 'MT', color: colors[5], img: 'img/mt.jpg', online: false, lastSeen: '1 day ago',
+      id: 6, name: 'Darrel Cang', initials: 'MT', color: colors[5], img: 'img/mt.jpg', online: false, lastSeen: '1 day ago',
       messages: [
-        { from: 'them', text: 'Eh masih di sini?',   time: '29 Apr', read: true },
-        { from: 'me',   text: 'Iya nih, kamu gimana?', time: '29 Apr', read: true },
-        { from: 'them', text: 'sedang mengetik...',   time: '29 Apr', read: false }
+        { from: 'them', text: 'Woi maen dk?',   time: '29 Apr', read: true },
+        { from: 'me',   text: 'Sabar lagi cuci piring', time: '29 Apr', read: true },
+        { from: 'them', text: 'Oke deh, Cepet dikit',   time: '29 Apr', read: false }
       ],
     },
     {
-      id: 7, name: 'Pak RT', initials: 'PR', color: colors[6], img: 'img/pr.jpg', online: false, lastSeen: '5 days ago',
+      id: 7, name: 'Lurah', initials: 'PR', color: colors[6], img: 'img/pr.jpg', online: false, lastSeen: '5 days ago',
       messages: [
         { from: 'them', text: 'Iuran bulan ini jangan lupa ya', time: '20 Apr', read: true },
         { from: 'me',   text: 'Hehe iya pak maaf telat',        time: '20 Apr', read: true },
         { from: 'them', text: 'wkwkwkwkw oke',                 time: '20 Apr', read: true }
       ],
-    }
+    },
+    {
+      id: 8, name: 'Kenny Wang', initials: 'KY', color: colors[0],img: 'img/ky.jpg', online: true, lastSeen: 'now',
+      messages: [
+        { from: 'them', text: 'Halo mau aku kenny', time: '14:20', read: true },
+        { from: 'me',   text: 'Halo',             time: '14:22', read: true },
+        { from: 'them', text: 'Sekolah mana?',    time: '14:30', read: true },
+        { from: 'me',   text: 'IGS dong!',      time: '14:31', read: true }
+      ],
+    },
+    {
+      id: 9, name: 'Karsten', initials: 'K', color: colors[0],img: 'img/k.png', online: false, lastSeen: '1 hour ago',
+      messages: [
+        { from: 'them', text: 'Besok pergi?', time: '01:12', read: true },
+        { from: 'me',   text: 'Gak tau',             time: '01:15', read: true },
+        { from: 'them', text: 'Coba aja',    time: '01:18', read: true },
+        { from: 'me',   text: 'Oke deh',      time: '01:20', read: true }
+      ],
+    },
   ];
 
   const replies = [
@@ -431,15 +450,34 @@
     const messages = document.querySelectorAll('.bubble-wrap');
 
     messages.forEach(msg => {
-    const text = msg.innerText.toLowerCase();
+      const text = msg.innerText.toLowerCase();
 
-    if (text.includes(keyword)) {
+      if (text.includes(keyword)) {
         msg.style.display = 'flex';
-    } else {
-      msg.style.display = 'none';
-    }
+      } else {
+        msg.style.display = 'none';
+      }
+    });
   });
-});
+
+  document.getElementById('fileInput').addEventListener('change', function () {
+    const file = this.files[0];
+    if (!file || !activeId) return;
+
+    const c = contacts.find(x => x.id === activeId);
+
+    c.messages.push({
+      from: 'me',
+      text: "📎 " + file.name,
+      time: getTime(),
+      read: false
+    });
+
+    renderMessages(c);
+    renderChats(document.getElementById('searchInput').value);
+
+    this.value = '';
+  });
 
   buildEmojiPanel();
   renderChats();
